@@ -59,6 +59,45 @@ def LOOCV(len_df, index):
         E += [i]
     return E, P
 
+# Receives the k value, the seed for the random part and the path
+# to extract the data
+def kFold(k, sid, path):
+    k = k
+    seed = sid
+
+    data = pd.read_csv(path)
+
+    df = pd.DataFrame(data)
+
+    line_count = 0
+
+    klase = df.iloc[:,-1]
+    claces = []
+    for i in klase:
+        if not(i in claces):
+            claces.append(i)
+
+    clases = [[] for i in range(len(claces))]
+
+    for row in range(len(df)):
+        clases[claces.index(df.iloc[row][-1])].append(line_count)
+        line_count += 1
+
+    print(line_count, " patrones procesados")
+
+    random.seed(seed)
+
+    for i in range(len(clases)):
+        random.shuffle(clases[i])
+
+    folds = [[] for i in range(k)]
+
+    for i in range(len(clases)):
+        for j in range(len(clases[i])):
+            folds[j % k].append(clases[i][j])
+
+    return folds, df
+
 
 
 

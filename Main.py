@@ -26,6 +26,7 @@ import ssl
 #Returns success count, len(P) and accuracy
 #suc, lenP accu = cf.uNN(df, E, P, 2)
 """
+" LOOCV
 data = pd.read_csv("DB/iris.csv")
 df = pd.DataFrame(data)
 suc = 0
@@ -39,7 +40,8 @@ print(datetime.datetime.now())
 print("Accuracy: ", suc/patterns)
 """
 
-data = pd.read_csv("DB/letter-recognition.csv")
+"""
+data = pd.read_csv("DB/iris.csv")
 df = pd.DataFrame(data)
 suc = 0
 patterns = len(df)
@@ -60,8 +62,58 @@ for i in range(patterns):
     suc += cf.uNN(df, e, [i], me)
 print(datetime.datetime.now())
 print("Accuracy: ", suc/patterns)
+"""
 
+# K - FOLD
+# Returns a list of list with k folds
+# Receives the value of k, the seed to random and the path of the DB
+k = 10
+seed = 325
+kfolds, df = vm.kFold(k, seed, "DB/iris.csv")
+#data = pd.read_csv("DB/iris.csv")
+#df = pd.DataFrame(data)
+E = []
+print("Preparing auxiliar array E")
+for i in range(len(kfolds)):
+    for j in range(len(kfolds[i])):
+        E.append(kfolds[i][j])
 
+print("Generating training matrix")
+mE = np.zeros((len(E), len(df.iloc[E[0]]) - 1))
+for i in range(len(E)):
+    for j in range(len(df.iloc[E[i]]) - 1):
+        mE[i][j] = df.iloc[E[i]][j]
+
+print("Making indexes to aid poping")
+indexes = [[] for i in range(len(kfolds))]
+contador = 0
+for i in range(len(kfolds)):
+    for j in range(len(kfolds[i])):
+        indexes[i].append(contador)
+        contador += 1
+
+print("Let's classify. Starting at:")
+timei = datetime.datetime.now()
+print(timei)
+accs = []
+corrects = []
+P = []
+E = np.array(E)
+for i in range(k):
+    P = kfolds[i].copy()
+    me = np.delete(mE, indexes[i], 0)
+    e = np.delete(E, indexes[i], None).tolist()
+    correct = cf.uNN(df, e, P, me)
+    corrects += [correct]
+    accs += [correct / len(P)]
+print(corrects, sum(accs) / k)
+
+timef = datetime.datetime.now()
+print(timef)
+print("Finished in :", timef - timei)
+
+"""
+# SEND A EMAIL
 port = 465
 password = ".1ErnoGauss1."
 smtp_server = "smtp.gmail.com"
@@ -72,7 +124,7 @@ context = ssl.create_default_context()
 with smtplib.SMTP_SSL(smtp_server, port, context = context) as server:
     server.login("hi.garcia.hdez@gmail.com", password)
     server.sendmail(sender_email, receiver_email, message)
-
+"""
 
 
 
