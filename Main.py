@@ -5,6 +5,7 @@ from scipy.spatial import distance
 import datetime
 import validationMethods as vm
 import classifiers as cf
+import dataProccessing as dap
 import csv
 import smtplib
 import ssl
@@ -40,13 +41,28 @@ print(datetime.datetime.now())
 print("Accuracy: ", suc/patterns)
 """
 
-"""
-data = pd.read_csv("DB/iris.csv")
+
+data = pd.read_csv("DB/crx.csv")
 df = pd.DataFrame(data)
 suc = 0
+#### Pre-proccessing part###
+categoricals = [0, 3, 4, 5, 6, 8, 9, 11, 12]
+maxs, mins = dap.Mam(df, categoricals)
+ranges = []
+for i in range(len(maxs)):
+    ranges.append(maxs[i] - mins[i])
+    
+df = dap.imputation(df, categoricals)
+print(df)
+#df = dap.delPatt(df)
+#print(df)
+df = dap.labelCoding(df, categoricals)
+#print(df)
+
 patterns = len(df)
 print("Let's classify. Starting at:")
-print(datetime.datetime.now())
+timei = datetime.datetime.now()
+print(timei)
 ##### LOOCV PART####
 E = [i for i in range(len(df))]
 
@@ -59,17 +75,21 @@ for i in range(patterns):
     e = E.copy()
     del e[i]
     me = np.delete(mE, i, 0)
+    #suc += cf.uNN_HEOM(df, e, [i], me, categoricals, ranges)
     suc += cf.uNN(df, e, [i], me)
 print(datetime.datetime.now())
 print("Accuracy: ", suc/patterns)
+timef = datetime.datetime.now()
+print(timef)
+print("Finished in :", timef - timei)
 """
 
 # K - FOLD
 # Returns a list of list with k folds
 # Receives the value of k, the seed to random and the path of the DB
-k = 10
-seed = 325
-kfolds, df = vm.kFold(k, seed, "DB/iris.csv")
+k = 5
+seed = 8121887
+kfolds, df = vm.kFold(k, seed, "DB/letter-recognition.csv")
 #data = pd.read_csv("DB/iris.csv")
 #df = pd.DataFrame(data)
 E = []
@@ -111,9 +131,9 @@ print(corrects, sum(accs) / k)
 timef = datetime.datetime.now()
 print(timef)
 print("Finished in :", timef - timei)
-
 """
-# SEND A EMAIL
+"""
+# SEND AN EMAIL
 port = 465
 password = ".1ErnoGauss1."
 smtp_server = "smtp.gmail.com"
