@@ -40,7 +40,7 @@ def labelCoding(df, cats):
     for i in range(len(cats)):
         prevs[i].sort(key=str.lower)
 
-    news = [[i for i in range(len(prevs[j]))] for j in range(len(prevs))]
+    news = [[(i+1) for i in range(len(prevs[j]))] for j in range(len(prevs))]
 
     for i in range(len(cats)):
         df[df.columns[cats[i]]].replace(prevs[i], news[i], inplace = True)
@@ -94,4 +94,18 @@ def Mam(df, cats):
     mins = aUx.min(axis = 0, skipna = True, numeric_only = True).tolist()
     return MAXs, mins
     
+def getCategoricals(df):
+    categoricals = []
+    df = delPatt(df)
+    aUx = df.apply(pd.to_numeric, errors = 'coerce')
+    types = aUx.dtypes
+    for i in range(1, len(types)):
+        if (type(np.int64()) == type(types[i])):
+            categoricals.append(i)
+    return categoricals
+
+
+
+
+
 

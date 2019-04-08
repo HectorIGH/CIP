@@ -27,7 +27,6 @@ def uNN_HEOM(df, E, P, mE, cats, ranges):
     for i in range(len(df.columns) - 1):
         if (not (i in cats)):
             nocats += [i]
-    nocats.pop()
 
     for i in range(len(P)):
         a = np.array([df.iloc[P[i]][:-1]])
@@ -48,15 +47,18 @@ def HEOM(a, b, cats, nocats, ranges):
     pat = []
     a = a.tolist()
     b = b.tolist()[0]
-    for i in range(len(b)):
-        if (a[i] == '?' or b[i] == '?'):
+    for i in range(len(a)):
+        if ((a[i] == '?') or (b[i] == '?')):
             pat.append(1)
+            continue
         if (i in cats):
             if (a[i] == b[i]):
                 pat.append(0)
+                continue
             else:
                 pat.append(1)
+                continue
         if (i in nocats):
-            #print(a[i], b[i], ranges[i])
-            pat.append(abs(a[i] - b[i])/ ranges[i])
+            pat.append(abs(float(a[i]) - float(b[i]))/ ranges[i])
+            continue
     return pat

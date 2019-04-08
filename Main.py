@@ -46,37 +46,40 @@ data = pd.read_csv("DB/crx.csv")
 df = pd.DataFrame(data)
 suc = 0
 #### Pre-proccessing part###
+print(dap.getCategoricals(df))
 categoricals = [0, 3, 4, 5, 6, 8, 9, 11, 12]
 maxs, mins = dap.Mam(df, categoricals)
 ranges = []
-for i in range(len(maxs)):
+for i in range(len(maxs) - 1):
     ranges.append(maxs[i] - mins[i])
     
-df = dap.imputation(df, categoricals)
-print(df)
-#df = dap.delPatt(df)
+#df = dap.imputation(df, categoricals)
 #print(df)
-df = dap.labelCoding(df, categoricals)
+#df = dap.delAtt(df)
 #print(df)
+#df = dap.labelCoding(df, categoricals)
+#print(df.head(100))
 
 patterns = len(df)
-print("Let's classify. Starting at:")
-timei = datetime.datetime.now()
-print(timei)
 ##### LOOCV PART####
 E = [i for i in range(len(df))]
 
-mE = np.zeros((len(E), len(df.iloc[E[0]]) - 1))
+#mE = np.zeros((len(E), len(df.iloc[E[0]]) - 1))
+mE = [[] for i in range(len(E))]
 for i in range(len(E)):
     for j in range(len(df.iloc[E[i]]) - 1):
-        mE[i][j] = df.iloc[E[i]][j]
-        
+        mE[i].append(df.iloc[E[i]][j])
+mE = np.array(mE)
+
+print("Let's classify. Starting at:")
+timei = datetime.datetime.now()
+print(timei)        
 for i in range(patterns):
     e = E.copy()
     del e[i]
     me = np.delete(mE, i, 0)
-    #suc += cf.uNN_HEOM(df, e, [i], me, categoricals, ranges)
-    suc += cf.uNN(df, e, [i], me)
+    suc += cf.uNN_HEOM(df, e, [i], me, categoricals, ranges)
+    #suc += cf.uNN(df, e, [i], me)
 print(datetime.datetime.now())
 print("Accuracy: ", suc/patterns)
 timef = datetime.datetime.now()
