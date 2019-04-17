@@ -95,14 +95,18 @@ def Mam(df, cats):
     return MAXs, mins
     
 def getCategoricals(df):
-    categoricals = []
     df = delPatt(df)
-    aUx = df.apply(pd.to_numeric, errors = 'coerce')
-    types = aUx.dtypes
-    for i in range(1, len(types)):
-        if (type(np.int64()) == type(types[i])):
-            categoricals.append(i)
-    return categoricals
+    modes = df.mode(axis = 0, dropna = True).iloc[0].tolist()
+    noCats = []
+    aux = [i for i in range(len(df.columns) - 2)]
+    for i in range(1, len(modes)):
+        try:
+            int(modes[i])
+            noCats.append(i - 1)
+        except ValueError:
+            continue
+    cats = [i for i in aux if i not in noCats]
+    return cats, noCats
 
 
 

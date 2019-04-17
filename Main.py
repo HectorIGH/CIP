@@ -46,8 +46,10 @@ data = pd.read_csv("DB/crx.csv")
 df = pd.DataFrame(data)
 suc = 0
 #### Pre-proccessing part###
-print(dap.getCategoricals(df))
-categoricals = [0, 3, 4, 5, 6, 8, 9, 11, 12]
+categoricals, noCats = dap.getCategoricals(df)
+print(categoricals)
+print(noCats)
+#categoricals = [0, 3, 4, 5, 6, 8, 9, 11, 12]
 maxs, mins = dap.Mam(df, categoricals)
 ranges = []
 for i in range(len(maxs) - 1):
