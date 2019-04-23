@@ -77,8 +77,9 @@ def imputation(df, cats):
         for j in range(len(cats)):
             dF[dF.columns[cats[j]]].replace(['?'], modas[i][cats[j]], inplace = True)
         for j in range(len(nocats)):
-            dF[dF.columns[nocats[j]]].replace(['?'], means[i][nocats[j]], inplace = True)
+            dF[dF.columns[nocats[j]]].replace(['?'], float(means[i][nocats[j]]), inplace = True)
         frames[i] = dF
+    #print(frames)
     
     return pd.concat(frames)
 
@@ -107,6 +108,31 @@ def getCategoricals(df):
             continue
     cats = [i for i in aux if i not in noCats]
     return cats, noCats
+
+def getClasses(df):
+    return list(set(df[df.columns[-1]].tolist()))
+
+def centroids(df):
+    frames = []
+    means = []
+    
+    classes = getClasses(df)
+    # Separates the data frame into data frames depending on the class
+    # and containing only the patterns in the training set
+    for clase in classes:
+        frames += [df[df[df.columns[-1]] == clase]]
+
+    for i in range(len(frames)):
+        aUx = frames[i].apply(pd.to_numeric, errors = 'coerce')
+        means += [aUx.mean(axis = 0, skipna = True, numeric_only = True)]
+
+    mE = [[] for i in range(len(classes))]
+    for i in range(len(classes)):
+        for j in range(len(means[i]) - 1):
+            mE[i].append(means[i][j])
+        mE[i].append(classes[i])
+
+    return mE
 
 
 

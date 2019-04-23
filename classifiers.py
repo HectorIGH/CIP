@@ -62,3 +62,32 @@ def HEOM(a, b, cats, nocats, ranges):
             pat.append(abs(float(a[i]) - float(b[i]))/ ranges[i])
             continue
     return pat
+
+def euclideanClassi(df, E, P, mE):
+    clase = -1
+    success = 0
+    classes = list(set(df[df.columns[-1]].tolist()))
+    confuMat = np.zeros((len(classes), len(classes)))
+    
+    for i in range(len(P)):
+        a = np.array([df.iloc[P[i]][:-1]])
+        MDistance = distance.cdist(mE, a, 'euclidean')
+        clase = -1
+        index = np.where(MDistance == np.amin(MDistance))
+        class_index = index[0][0]
+        clase = E[class_index][-1]
+        confuMat[classes.index(df.iloc[P[i]][-1])][classes.index(clase)] += 1
+
+    return classes.index(df.iloc[P[i]][-1]), classes.index(clase), confuMat
+
+
+
+
+
+
+
+
+
+
+
+
